@@ -86,7 +86,7 @@ def welcome(USERNAME):
     hour = int(dt.now().hour)
     if hour >= 0 and hour < 12:
         speak("Good morning {}".format(USERNAME))
-        country_user_from = getLocation(get_weather = True)
+        # country_user_from = getLocation(get_weather = True) -----------------
         speak("How may I help you ?")
 
     elif hour>=12 and hour < 18:
@@ -104,10 +104,12 @@ def welcome(USERNAME):
 
 def takeCommand():
     r = sr.Recognizer()
+    # put try except here -----------------
     with sr.Microphone() as source:
         r.adjust_for_ambient_noise(source)
         print("Listening ...")
         audio = r.listen(source,  timeout = 3)
+
 
         try:
             print("Recognizing ...")
@@ -132,7 +134,7 @@ def takeCommand():
             print("Could not request results from " +
                 "Google Speech Recognition service; {0}".format(e))
 
-    return query
+        return query
 
 def search_wikipedia(query):
 
@@ -146,16 +148,41 @@ def news_fetch(type_, topic, country = 'us'):
     # Init
     newsapi = NewsApiClient(api_key = newsapi_api_key)
 
-    if type_ == 'headlines':
+    try:
+        while('' in topic):
+            topic.remove("")
 
+        for i, val in enumerate(topic):
+            print("news_fetch, topic[i]: ",topic[i] )
+            topic = topic[i]   
+
+    except :
+        pass              
+
+    print('in news_fetch, topic: {}, type: {}, country: {}'.format(topic, type_, country))
+
+    if type_ == 'headline' or type_ == 'headlines':
+        
         # /v2/top-headlines
-        top_headlines = newsapi.get_top_headlines(q=topic,
+        top_headlines = newsapi.get_everything(q= topic,
                                                 sources='bbc-news,the-verge',
-                                                category='business',
+                                                domains='bbc.co.uk,techcrunch.com',
                                                 language='en',
-                                                country=country)
-        print("Full news:\n", top_headlines)
-        speak(top_headlines) 
+                                                page_size = 5)
+
+        articles = top_headlines['articles']
+
+        if top_headlines['totalResults'] == 0:
+            speak('Sorry, no news headlines found')
+        else:
+
+            speak("Todays top 5 news headlines on {} are ".format(topic)) 
+
+            for i, val in enumerate(articles):
+                print((i), val['title'])
+                speak(val['title'])
+        
+        #speak("Todays top 5 news headlines on {} are {}".format(topic, top_headlines)) 
 
     elif type_ == "just_news:":
         # /v2/everything
@@ -180,7 +207,7 @@ def tasks(query, search_query, country_user_from, search_query_nouns=None):
     news_headline_keywords = ['news', 'headline']
     news_keywords = ['test']
 
-    print("search_query_nouns: ", search_query_nouns)
+    print("in tasks(), search_query_nouns: ", search_query_nouns)
 
     if "wikipedia" in search_query.lower():
     
@@ -233,17 +260,25 @@ def tasks(query, search_query, country_user_from, search_query_nouns=None):
             if val == 'news':
                 search_query_nouns[n] = ""
 
+        search_query = search_query.lower().replace('news', ' ')
+        search_query = search_query.lower().replace('headline', ' ')
+        
         print("calling news")
         news_fetch(type_ = 'just_news', topic = search_query_nouns, country = country_user_from)
 
     elif all(c in search_query_nouns for c in news_headline_keywords):
+
         for n, val in enumerate(search_query_nouns):
             if val == 'news' or val == 'headline':
                 search_query_nouns[n] = ""
 
+        
+        search_query = search_query.lower().replace('news', '')
+        search_query = search_query.lower().replace('headline', '')
+        print("In task(), headline, search_query: ", search_query)
 
         print("calling news headlines")
-        news_fetch(type_ = 'headline', topic = search_query_nouns, country = country_user_from)
+        news_fetch(type_ = 'headline', topic = search_query.lower(), country = country_user_from)
 
     else:
         pass
@@ -294,8 +329,9 @@ def main():
     while 1:
 
         query = takeCommand()
-        
+        ## put try exception here -----------------------
         search_query = stopWord_removal(query)
+        print("in main() after stop word removal: ",search_query)
 
         if re.search(r'\b(exit|quit|goodbye|goodbyejarvis|goodnight)\b', search_query, re.I):
             if search_query == "goodnight":
@@ -306,6 +342,7 @@ def main():
                 break
         
         search_query_nouns = finding_nouns(search_query)
+        print("in main() after search_query_nouns: ",search_query_nouns)
 
         tasks(query, search_query, country_user_from, search_query_nouns)
     
