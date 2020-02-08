@@ -147,7 +147,7 @@ def news_fetch(type_, topic, country = 'us'):
 
     # Init
     newsapi = NewsApiClient(api_key = newsapi_api_key)
-
+    
     try:
         while('' in topic):
             topic.remove("")
@@ -177,35 +177,42 @@ def news_fetch(type_, topic, country = 'us'):
         else:
 
             speak("Todays top 5 news headlines on {} are ".format(topic)) 
-
+            
             for i, val in enumerate(articles):
                 print((i), val['title'])
                 speak(val['title'])
         
         #speak("Todays top 5 news headlines on {} are {}".format(topic, top_headlines)) 
 
-    elif type_ == "just_news:":
+    elif type_ == "just_news":
         # /v2/everything
         all_articles = newsapi.get_everything(q=topic,
                                             sources='bbc-news,the-verge',
                                             domains='bbc.co.uk,techcrunch.com',
-                                            from_param='2017-12-01',
-                                            to='2017-12-12',
                                             language='en',
                                             sort_by='relevancy',
-                                            page=2)
+                                            page_size = 5)
 
-        print("Full news:\n", all_articles)
-        speak(all_articles)                                        
+        content = all_articles['articles']
+
+        if all_articles['totalResults'] == 0:
+            speak('Sorry, no news headlines found')
+        else:
+
+            speak("Todays top 5 news on {} are ".format(topic)) 
+            
+            for i, val in enumerate(content):
+                print((i), val['content'])
+                speak(val['content'])                         
     
-    # /v2/sources
-    sources = newsapi.get_sources()
+    else:
+        speak('cant access sorry')
 
 
 def tasks(query, search_query, country_user_from, search_query_nouns=None):
     
     news_headline_keywords = ['news', 'headline']
-    news_keywords = ['test']
+    news_keywords = ['news']
 
     print("in tasks(), search_query_nouns: ", search_query_nouns)
 
@@ -255,17 +262,6 @@ def tasks(query, search_query, country_user_from, search_query_nouns=None):
         date = dt.now().date()
         speak("today's date is, "+str(date))
 
-    elif any(c in search_query_nouns for c in news_keywords):
-        for n, val in enumerate(search_query_nouns):
-            if val == 'news':
-                search_query_nouns[n] = ""
-
-        search_query = search_query.lower().replace('news', ' ')
-        search_query = search_query.lower().replace('headline', ' ')
-        
-        print("calling news")
-        news_fetch(type_ = 'just_news', topic = search_query_nouns, country = country_user_from)
-
     elif all(c in search_query_nouns for c in news_headline_keywords):
 
         for n, val in enumerate(search_query_nouns):
@@ -279,6 +275,17 @@ def tasks(query, search_query, country_user_from, search_query_nouns=None):
 
         print("calling news headlines")
         news_fetch(type_ = 'headline', topic = search_query.lower(), country = country_user_from)
+
+    elif any(c in search_query_nouns for c in news_keywords):
+        for n, val in enumerate(search_query_nouns):
+            if val == 'news':
+                search_query_nouns[n] = ""
+
+        search_query = search_query.lower().replace('news', ' ')
+        search_query = search_query.lower().replace('headline', ' ')
+        
+        print("calling news")
+        news_fetch(type_ = 'just_news', topic = search_query.lower(), country = country_user_from)        
 
     else:
         pass
