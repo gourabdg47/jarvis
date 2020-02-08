@@ -2,7 +2,7 @@
 Just to learn and have some fun
 
 ```
-# To-Do:
+To-Do:
 
 - [X] add initial db setup with bsic info
 - [X] check that info on every setup
