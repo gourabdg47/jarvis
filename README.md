@@ -5,7 +5,7 @@ To-Do:
 
 - [X] add initial db setup with bsic info
 - [X] check that info on every setup
-- [X] fetch news based on keywords
+- [X] fetch news and highlights based on keywords
 - [ ] train bot to have normal conversation
 - [ ] add to-do
 - [ ] add fetch delete form to-do
@@ -26,6 +26,7 @@ To-Do:
 * Ask about todays weather
 * Ask the current time or todays date 
 * Ask "news headlines on Indian politics' or "news headlines on artificial intilligence"
+* Ask "news on Indian politics' or "news on artificial intilligence"
 
 ```diff
 - Work is in progress ====4%-----------------------100%
