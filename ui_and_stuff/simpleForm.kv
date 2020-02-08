@@ -1,0 +1,49 @@
+<LblTxt@BoxLayout>:
+    orientation: 'horizontal'      
+    lblTxtIn: 'default'
+    theTxt: iAmTxt
+    Label:
+        text: root.lblTxtIn
+    TextInput:
+        id: iAmTxt  
+        text: ''        
+
+<MyLayout@BoxLayout>:  
+    orientation: 'vertical'
+
+    LblTxt:   
+        id: lt0
+        lblTxtIn: 'Firstname'
+
+    LblTxt:   
+        id: lt1
+        lblTxtIn: 'Lastname'
+
+    LblTxt:   
+        id: lt2
+        lblTxtIn: 'Username'
+
+
+    Button:
+        text: 'print LblTxtInput [0, 1, 2]'
+        on_release: print(lt0.theTxt.text, lt1.theTxt.text, lt2.theTxt.text)
+
+MyLayout
+
+# <UI>:
+#     title: 'InputDialog'
+#     auto_dismiss: False
+#     id: test1
+
+#     RelativeLayout:
+#         orientation: 'vertical'
+#         pos: self.pos
+#         size: root.size
+#         id: test2
+
+#         TextInput:
+#             id: input
+#             hint_text:'Enter compounds'
+#             pos_hint: {'center_x': 0.5, 'center_y': 0.705}
+#             size_hint: 0.95, 0.5
+#             on_text: app.process()

@@ -1,0 +1,30 @@
+# Jarvis - just 'another' assistant :shipit:
+Just to learn and have some fun
+
+```
+# To-Do:
+
+- [X] add initial db setup with bsic info
+- [X] check that info on every setup
+- [ ] fetch news based on keywords
+- [ ] train bot to have normal conversation
+- [ ] add to-do
+- [ ] add fetch delete form to-do
+- [ ] add appoinments and reminders
+- [ ] threading
+- [ ] intent classification
+- [ ] custom entity recognization
+- [ ] to be planned . . .
+```
+
+# Steps:
+* pip3 install -r requirements.txt
+* python3  main.py
+* Say "play latest EMD on youtube" or "play funny videos on youtube"
+* Say "Tell me  about Bill Gates from wikipedia" or "Tell me about DNA from wikipedia"
+* Ask about todays weather
+* Ask the current time or todays date 
+
+```diff
+- Work is in progress ====4%-----------------------100%
+```
