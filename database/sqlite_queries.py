@@ -22,7 +22,7 @@ def create_table(table_name = "default", database_name = None):
         conn.close()
     except Exception as e:
         colours.prRed("Error creating table in {}\n{}".format(table_name, )).reset_colour_style()
-        # colours.reset_colour_style()
+        colours.reset_colour_style()
         print("Error creating table in {}\n{}".format(table_name, ))
 
     return status
@@ -42,7 +42,7 @@ def insert_query(INIT_STATUS, FIRSTNAME, LASTNAME, USERNAME, GENDER, DOB, GMAIL_
         conn.close()
     except Exception as e:
         colours.prRed("Error inserting query in table {}\n{}".format(table_name, e)).reset_colour_style()
-        # colours.reset_colour_style()
+        colours.reset_colour_style()
         print("Error inserting query in table {}\n{}".format(table_name, e))
 
     return status
@@ -79,7 +79,7 @@ def select_query(table_name = "default", database_name = None):
         return status, INIT_STATUS, USERNAME
     except Exception as e:
         colours.prRed("Error fetching data from table {}\n{}".format(table_name, e)).reset_colour_style()
-        # colours.reset_colour_style()
+        colours.reset_colour_style()
         print("Error fetching data from table {}\n{}".format(table_name, e))
 
         return status    
@@ -97,7 +97,7 @@ def update_query(table_name = "default", database_name = None):
         print ("Total number of rows updated {} in table {}".format(conn.total_changes, table_name))
     except:
         colours.prRed("Error updating data in table {}".format(table_name)).reset_colour_style()
-        # colours.reset_colour_style()
+        colours.reset_colour_style()
         print("Error updating data in table {}".format(table_name))
 
     return status    
@@ -114,7 +114,7 @@ def delete_query(table_name = "default", database_name = None):
         print ("Total number of rows deleted {} in table {}".format(conn.total_changes, table_name))
     except:
         colours.prRed("Error deleting data from table {}".format(table_name)).reset_colour_style()
-        # colours.reset_colour_style()
+        colours.reset_colour_style()
         print("Error deleting data from table {}".format(table_name))    
 
     return status

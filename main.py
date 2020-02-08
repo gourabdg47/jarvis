@@ -13,13 +13,14 @@ import socket
 from bs4 import BeautifulSoup
 import requests
 
+import country_converter as coco
+from newsapi import NewsApiClient
+
 from api.api_keys import weather_pyowm_api_key, getlocation_access_token_ipinfo, newsapi_api_key
 
 from NLU.preprocess import stopWord_removal
-import country_converter as coco
-from NLU.pos_tagging import finding_nouns
-from newsapi import NewsApiClient
 from youtube_first_link import get_first_link
+from NLU.pos_tagging import finding_nouns
 from first_setup import *
 
 from database.sqlite_queries import *
