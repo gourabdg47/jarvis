@@ -14,7 +14,9 @@ from bs4 import BeautifulSoup
 import requests
 
 from api.api_keys import weather_pyowm_api_key, getlocation_access_token_ipinfo, newsapi_api_key
+
 from NLU.preprocess import stopWord_removal
+import country_converter as coco
 from NLU.pos_tagging import finding_nouns
 from newsapi import NewsApiClient
 from youtube_first_link import get_first_link
@@ -74,7 +76,7 @@ def getLocation(get_weather = False):
     if get_weather == True:
         getWeatherReport(details)
     else:
-        return details.city    
+        return details.country_name  
     
 
 def welcome(USERNAME):
@@ -136,36 +138,48 @@ def search_wikipedia(query):
     results = wikipedia.summary(query, sentences=2)
     speak(results)
 
-def news_fetch(type, topic, country = 'us'):
+def news_fetch(type_, topic, country = 'us'):
+
+    country = standard_names = coco.convert(names = country, to='ISO2')
 
     # Init
     newsapi = NewsApiClient(api_key = newsapi_api_key)
 
-    # /v2/top-headlines
-    top_headlines = newsapi.get_top_headlines(q='bitcoin',
-                                            sources='bbc-news,the-verge',
-                                            category='business',
-                                            language='en',
-                                            country='us')
+    if type_ == 'headlines':
 
-    # /v2/everything
-    all_articles = newsapi.get_everything(q='bitcoin',
-                                        sources='bbc-news,the-verge',
-                                        domains='bbc.co.uk,techcrunch.com',
-                                        from_param='2017-12-01',
-                                        to='2017-12-12',
-                                        language='en',
-                                        sort_by='relevancy',
-                                        page=2)         
+        # /v2/top-headlines
+        top_headlines = newsapi.get_top_headlines(q=topic,
+                                                sources='bbc-news,the-verge',
+                                                category='business',
+                                                language='en',
+                                                country=country)
+        print("Full news:\n", top_headlines)
+        speak(top_headlines) 
+
+    elif type_ == "just_news:":
+        # /v2/everything
+        all_articles = newsapi.get_everything(q=topic,
+                                            sources='bbc-news,the-verge',
+                                            domains='bbc.co.uk,techcrunch.com',
+                                            from_param='2017-12-01',
+                                            to='2017-12-12',
+                                            language='en',
+                                            sort_by='relevancy',
+                                            page=2)
+
+        print("Full news:\n", all_articles)
+        speak(all_articles)                                        
     
     # /v2/sources
     sources = newsapi.get_sources()
 
 
-def tasks(query, search_query, search_query_nouns=None):
+def tasks(query, search_query, country_user_from, search_query_nouns=None):
     
     news_headline_keywords = ['news', 'headline']
     news_keywords = ['news']
+
+    print("search_query_nouns: ", search_query_nouns)
 
     if "wikipedia" in search_query.lower():
     
@@ -202,8 +216,13 @@ def tasks(query, search_query, search_query_nouns=None):
         date = dt.now().date()
         speak("today's date is, "+str(date))
 
-    elif any(c in search_query.lower() for c in news_keywords):
-        news_fetch(type = 'headline', topic = search_query_nouns)
+    elif any(c in search_query_nouns for c in news_keywords):
+        print("calling news")
+        news_fetch(type_ = 'just_news', topic = search_query_nouns, country = country_user_from)
+
+    elif all(c in search_query_nouns for c in news_headline_keywords):
+        print("calling news headlines")
+        news_fetch(type_ = 'headline', topic = search_query_nouns, country = country_user_from)
 
     else:
         pass
@@ -267,7 +286,7 @@ def main():
         
         search_query_nouns = finding_nouns(search_query)
 
-        tasks(query, search_query, search_query_nouns)
+        tasks(query, search_query, country_user_from, search_query_nouns)
     
 
 #main starts here ---
