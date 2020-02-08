@@ -56,21 +56,27 @@ def select_query(table_name = "default", database_name = None):
         
         for row in cursor:
             print("ID = ", row[0])
+            ID = row[0]
             print("INIT_STATUS = ", row[1])
             INIT_STATUS = row[1]
             print("FIRSTNAME = ", row[2])
+            FIRSTNAME = row[2]
             print("LASTNAME = ", row[3])
+            LASTNAME = row[3]
             print("USERNAME = ", row[4])
+            USERNAME = row[4]
             print("GENDER = ", row[5])
             print("DOB = ", row[6])
+            DOB =  row[6]
             print("GMAIL ID = ", row[7], "\n")
+            GMAIL_ID = row[7]
 
         status = True
         #print("Operation done successfully")
         conn.close()
 
         print("Inside select_query, INIT_STATUS: {}, INIT_STATUS type: {}".format(INIT_STATUS, type(INIT_STATUS)))
-        return status, INIT_STATUS
+        return status, INIT_STATUS, USERNAME
     except Exception as e:
         colours.prRed("Error fetching data from table {}\n{}".format(table_name, e)).reset_colour_style()
         # colours.reset_colour_style()

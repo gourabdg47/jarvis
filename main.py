@@ -13,9 +13,10 @@ import socket
 from bs4 import BeautifulSoup
 import requests
 
-from api.api_keys import weather_pyowm_api_key, getlocation_access_token_ipinfo
+from api.api_keys import weather_pyowm_api_key, getlocation_access_token_ipinfo, newsapi_api_key
 from NLU.preprocess import stopWord_removal
 from NLU.pos_tagging import finding_nouns
+from newsapi import NewsApiClient
 from youtube_first_link import get_first_link
 from first_setup import *
 
@@ -31,7 +32,9 @@ init_db_name = "database\\db\\initial_db.db" #first_time_save_to_database.db_nam
 init_table_name = "init_info_table"
 todo_table_name = "todo_table"
 
+global CREATOR
 CREATOR = "Gourab"
+
 
 def system_details():
     platform = platform.system()
@@ -60,41 +63,48 @@ def getWeatherReport(location):
     print("City: {}\nWind speed: {}\nHumidity: {}\nTemperature(Celsius): {}".format(city, wind_speed, humidity, c_temperature))
 
 
-def getLocation():
+
+def getLocation(get_weather = False):
 
     access_token_ipinfo = getlocation_access_token_ipinfo
 
     handler = ipinfo.getHandler(access_token_ipinfo)
     details = handler.getDetails()
-
-    getWeatherReport(details)
+    
+    if get_weather == True:
+        getWeatherReport(details)
+    else:
+        return details.city    
     
 
-def welcome():
+def welcome(USERNAME):
+    
 
     hour = int(dt.now().hour)
     if hour >= 0 and hour < 12:
-        speak("Good morning {}".format(CREATOR))
-        getLocation()
+        speak("Good morning {}".format(USERNAME))
+        country_user_from = getLocation(get_weather = True)
         speak("How may I help you ?")
 
     elif hour>=12 and hour < 18:
-        speak("Good afternoon {}".format(CREATOR))
+        speak("Good afternoon {}".format(USERNAME))
         speak("How may I help you ?")
 
     elif hour>=18 and hour < 24:
-        speak("Good evening {}".format(CREATOR))
+        speak("Good evening {}".format(USERNAME))
         speak("How may I help you ?")
 
     else:
-        speak("Good night {}".format(CREATOR))
+        speak("Good night {}".format(USERNAME))
         speak("How may I help you ?")
+     
 
 def takeCommand():
     r = sr.Recognizer()
     with sr.Microphone() as source:
+        r.adjust_for_ambient_noise(source)
         print("Listening ...")
-        audio = r.listen(source)
+        audio = r.listen(source,  timeout = 3)
 
         try:
             print("Recognizing ...")
@@ -105,6 +115,8 @@ def takeCommand():
 
         except Exception as e:
             print("Exception created: ", e)
+            speak(
+                "I couldn't understand what you said! Would you like to repeat?")
             query = None
 
             return(takeCommand())
@@ -124,8 +136,36 @@ def search_wikipedia(query):
     results = wikipedia.summary(query, sentences=2)
     speak(results)
 
+def news_fetch(type, topic, country = 'us'):
+
+    # Init
+    newsapi = NewsApiClient(api_key = newsapi_api_key)
+
+    # /v2/top-headlines
+    top_headlines = newsapi.get_top_headlines(q='bitcoin',
+                                            sources='bbc-news,the-verge',
+                                            category='business',
+                                            language='en',
+                                            country='us')
+
+    # /v2/everything
+    all_articles = newsapi.get_everything(q='bitcoin',
+                                        sources='bbc-news,the-verge',
+                                        domains='bbc.co.uk,techcrunch.com',
+                                        from_param='2017-12-01',
+                                        to='2017-12-12',
+                                        language='en',
+                                        sort_by='relevancy',
+                                        page=2)         
+    
+    # /v2/sources
+    sources = newsapi.get_sources()
+
 
 def tasks(query, search_query, search_query_nouns=None):
+    
+    news_headline_keywords = ['news', 'headline']
+    news_keywords = ['news']
 
     if "wikipedia" in search_query.lower():
     
@@ -151,7 +191,7 @@ def tasks(query, search_query, search_query_nouns=None):
             "https://www.youtube.com{}".format(first_link))
     
     elif "weather" in search_query.lower():
-        getLocation()
+        getLocation(get_weather = True)
 
     elif "time" in search_query.lower():
         now = dt.now().time()
@@ -161,6 +201,9 @@ def tasks(query, search_query, search_query_nouns=None):
     elif "date" in search_query.lower():
         date = dt.now().date()
         speak("today's date is, "+str(date))
+
+    elif any(c in search_query.lower() for c in news_keywords):
+        news_fetch(type = 'headline', topic = search_query_nouns)
 
     else:
         pass
@@ -177,14 +220,15 @@ def playMusic():
 
 
 def main():
-    
+
+
     ## FIrst setup (One time) ##############
     # Checking initial status from database-
     # * check if the database is there or not 1st then status u dummy :)
 
     while 1:
         try:
-            select_status, INIT_STATUS = select_query(init_table_name, init_db_name)
+            select_status, INIT_STATUS, USERNAME = select_query(init_table_name, init_db_name)
 
             if INIT_STATUS == 'True':
                 break
@@ -201,7 +245,12 @@ def main():
   
     #############
 
-    welcome()
+    try:
+        country_user_from = getLocation(get_weather = False)
+    except :
+        pass    
+    welcome(USERNAME)
+
     while 1:
 
         query = takeCommand()
