@@ -1,8 +1,7 @@
 # Jarvis - just 'another' assistant :shipit:
 Just to learn and have some fun
 
-```
-# To-Do:
+To-Do:
 
 - [X] add initial db setup with bsic info
 - [X] check that info on every setup
@@ -15,10 +14,10 @@ Just to learn and have some fun
 - [ ] intent classification
 - [ ] custom entity recognization
 - [ ] to be planned . . .
-```
 
 # Steps:
 * pip3 install -r requirements.txt
+* make a folder called api and add a file called api_keys.py, add ur  pyowm api key and ipinfo access token there in variables named weather_pyowm_api_key, getlocation_access_token_ipinfo
 * python3  main.py
 * Say "play latest EMD on youtube" or "play funny videos on youtube"
 * Say "Tell me  about Bill Gates from wikipedia" or "Tell me about DNA from wikipedia"
