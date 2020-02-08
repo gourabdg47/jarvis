@@ -1,7 +1,6 @@
 # Jarvis - just 'another' assistant :shipit:
 Just to learn and have some fun
 
-```
 To-Do:
 
 - [X] add initial db setup with bsic info
@@ -15,7 +14,6 @@ To-Do:
 - [ ] intent classification
 - [ ] custom entity recognization
 - [ ] to be planned . . .
-```
 
 # Steps:
 * pip3 install -r requirements.txt
