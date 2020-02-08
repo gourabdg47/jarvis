@@ -177,7 +177,7 @@ def news_fetch(type_, topic, country = 'us'):
 def tasks(query, search_query, country_user_from, search_query_nouns=None):
     
     news_headline_keywords = ['news', 'headline']
-    news_keywords = ['news']
+    news_keywords = ['test']
 
     print("search_query_nouns: ", search_query_nouns)
 
@@ -195,7 +195,18 @@ def tasks(query, search_query, country_user_from, search_query_nouns=None):
     
     elif "youtube" in search_query.lower():
 
-        new_query = query.replace('in YouTube', '')
+        try:
+            new_query = query.replace('in YouTube', '')
+        except:
+            pass
+        try:
+            new_query = new_query.replace('from YouTube', '')
+        except:
+            pass
+        try:
+            new_query = new_query.replace('play', '')
+        except:
+            pass    
         new_query = new_query.replace(' ', '+')
         link = "https://www.youtube.com/results?search_query="+new_query
         print("Opening link: ", link)
@@ -217,10 +228,19 @@ def tasks(query, search_query, country_user_from, search_query_nouns=None):
         speak("today's date is, "+str(date))
 
     elif any(c in search_query_nouns for c in news_keywords):
+        for n, val in enumerate(search_query_nouns):
+            if val == 'news':
+                search_query_nouns[n] = ""
+
         print("calling news")
         news_fetch(type_ = 'just_news', topic = search_query_nouns, country = country_user_from)
 
     elif all(c in search_query_nouns for c in news_headline_keywords):
+        for n, val in enumerate(search_query_nouns):
+            if val == 'news' or val == 'headline':
+                search_query_nouns[n] = ""
+
+
         print("calling news headlines")
         news_fetch(type_ = 'headline', topic = search_query_nouns, country = country_user_from)
 
