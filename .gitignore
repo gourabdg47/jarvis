@@ -46,6 +46,7 @@ api_keys.py
 __pycache__
 jarvis_env
 jarvis-vs.code-workspace
+*.ipynb
 =======
 
 >>>>>>> Stashed changes
